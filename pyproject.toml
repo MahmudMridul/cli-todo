@@ -1,0 +1,7 @@
+[project]
+name = "cli-todo"
+version = "1.0.0"
+description = "A simple command-line to-do list application."
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = []
