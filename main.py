@@ -12,6 +12,7 @@ def get_todos_from_json() -> list:
 
 def write_todos_to_json(todos: list):
     with open(file_path, "w", encoding="utf-8") as file:
+        # ensure_ascii=False to allow non-ASCII characters to be written properly
         json.dump(todos, file, indent=4, ensure_ascii=False)
 
 def display_todo_item(todo: TodoItem):
@@ -68,27 +69,43 @@ def update_todo(id: str, title: str, description: str, status: str):
     else:
         print("ID and Title are required\n")
 
+def delete_todo(id: str):
+    if id:
+        todos = get_todos_from_json()
+
+        filtered_todos = [item for item in todos if item['id'] != id]
+
+        if len(todos) == len(filtered_todos):
+            print("No items found.\n")
+            return
+        write_todos_to_json(filtered_todos)
+        print("Deleted successfully!\n")
+
+    else:
+        print("ID is required.\n")
+
 
 
 def main():
     if not file_path.is_file():
         print("data.json not found. Creating data.json...")
 
-        with open(file_path, "w", encoding="utf-8") as f:
-            # ensure_ascii=False to allow non-ASCII characters to be written properly
-            json.dump([], f, indent=4, ensure_ascii=False)
+        write_todos_to_json([])
+
     else:
         print("Todo List:")
-        with open(file_path, "r", encoding="utf-8") as f:
-            todos = json.load(f)
-            display_todo_list(todos)
+        
+        todos = get_todos_from_json()
+        display_todo_list(todos)
         terminate = False
+
         while not terminate:
-            user_input = input("Enter 'add' to add a new todo item\n'update' to edit existing item\n'list' to see items\n'exit' to quit:\n").lower()
-            
+            user_input = input("Enter\n'add' to add a new todo item\n'update' to edit existing item\n'delete' to remove an item\n'list' to see items\n'exit' to quit:\n").lower()
+
             if user_input == "exit":
                 terminate = True
-                print("Exiting...")
+                print("Exiting...\n")
+
             elif user_input == "list":
                 todos = get_todos_from_json()
                 display_todo_list(todos)
@@ -107,6 +124,10 @@ def main():
                     description=todo_array[2],
                     status=todo_array[3]
                 )
+            
+            elif user_input == "delete":
+                id = input("Enter ID:\n")
+                delete_todo(id)
 
 
 
